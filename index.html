@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Loja eletrônica</title>
+  
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <link rel="stylesheet" href="style.css">
+  
+  
+</head>
+<body>
+
+  <div id="app">
+    
+    <div class="topo">
+      <h1>Loja eletrônica</h1>
+      <h2>Itens no carrinho: {{ carrinho }}</h2>
+    </div>
+
+    <div class="busca">
+      <input 
+        type="text" 
+        v-model="BuscaProduto" 
+        placeholder="Digite para buscar um produto..."
+      >
+    </div>
+
+    <div class="lista-produtos">
+      <product-card 
+        v-for="item in produtosFiltrados" 
+        :key="item.id"
+        :nome="item.nome"
+        :preco="item.preco"
+        :imagem="item.imagem"
+        @adicionar="adicionarItemcarrinho"
+      ></product-card>
+    </div>
+
+    <p v-if="produtosFiltrados.length === 0">
+      Produto não foi encontrado.
+    </p>
+
+  </div>
+
+  <script>
+    const app = Vue.createApp({
+      data() {
+        return {
+          carrinho: 0,
+          BuscaProduto: '',
+          produtos: [
+            { id: 1, nome: 'Fone de Ouvido', preco: 150.00, imagem: 'imagens/fone.jpg' },
+            { id: 2, nome: 'Teclado', preco: 250.00, imagem: 'imagens/teclado.jpg' },
+            { id: 3, nome: 'Mouse Sem Fio', preco: 80.00, imagem: 'imagens/mouse.jpg' },
+            { id: 4, nome: 'Monitor 24 polegadas', preco: 800.00, imagem: 'imagens/monitor.jpg' }
+          ]
+        }
+      },
+     
+      methods: {
+        adicionarItemcarrinho() {
+          this.carrinho++;
+        }
+      },
+      
+      computed: {
+        produtosFiltrados() {
+          return this.produtos.filter(p => {
+            return p.nome.toLowerCase().includes(this.BuscaProduto.toLowerCase());
+          });
+        }
+      }
+    });
+
+    app.component('product-card', {
+      props: ['nome', 'preco', 'imagem'],
+      template: `
+        <div class="card-produto">
+          <img :src="imagem" :alt="nome">
+          <h3>{{ nome }}</h3>
+          <p>R$ {{ preco.toFixed(2) }}</p>
+          <button @click="$emit('adicionar')">Adicionar ao Carrinho</button>
+        </div>
+      `
+    });
+
+    app.mount('#app');
+  </script>
+
+</body>
+</html>
